@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<!--
+  ============================================================================
+  EJERCICIO 1 — FORMULARIO CON VALIDACIÓN Y ENVÍO
+  Práctica Profesional I · TP2 (Maquetado estático)
+  Temática: pedido de cosmética Mary Kay — Consultora Nélida Beatriz Díaz
+  Tecnologías: HTML5 + Bootstrap 5.3 (validación nativa + validación Bootstrap)
+  Autor: Federico Cabrera
+  ----------------------------------------------------------------------------
+  Cómo funciona el envío:
+  El formulario valida en el navegador (HTML5 + Bootstrap). Si todos los campos
+  son válidos, en vez de recargar la página arma un mensaje de pedido y lo envía
+  por WhatsApp a la consultora (igual que la página real de Nélida). Para un envío
+  a un servidor (base de datos / correo) se reemplazaría el handler por un fetch()
+  hacia un backend; se deja indicado en el código.
+  ============================================================================
+-->
+<html lang="es-AR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pedido Mary Kay · Nélida Beatriz Díaz</title>
+
+  <!-- Bootstrap 5.3 (CSS) desde CDN -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+
+  <!-- Tipografías: Fraunces (títulos, elegante) + Jost (cuerpo) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,400&family=Jost:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+
+  <!-- Identidad de marca (rosa Mary Kay). Solo estética; la estructura es Bootstrap -->
+  <style>
+    :root {
+      --mk-rosa:    #e6688f;   /* rosa principal Mary Kay */
+      --mk-rosa-osc:#c14b72;   /* rosa para hover         */
+      --mk-crema:   #fff5f7;   /* fondo suave             */
+      --mk-tinta:   #3a2630;   /* texto principal         */
+    }
+    body {
+      font-family: 'Jost', sans-serif;
+      color: var(--mk-tinta);
+      background:
+        radial-gradient(circle at 20% 0%, #ffe3ec 0%, transparent 45%),
+        radial-gradient(circle at 100% 100%, #ffe9f0 0%, transparent 40%),
+        var(--mk-crema);
+      min-height: 100vh;
+    }
+    h1, h2, .titulo-serif {
+      font-family: 'Fraunces', serif;
+      letter-spacing: .3px;
+    }
+    /* Tarjeta del formulario */
+    .tarjeta-form {
+      background: #ffffff;
+      border-radius: 22px;
+      box-shadow: 0 18px 50px rgba(193, 75, 114, .18);
+      border: 1px solid #f4d4de;
+    }
+    /* Botón con la marca */
+    .btn-mk {
+      background: var(--mk-rosa);
+      border-color: var(--mk-rosa);
+      color: #fff;
+      font-weight: 500;
+      letter-spacing: .4px;
+    }
+    .btn-mk:hover, .btn-mk:focus {
+      background: var(--mk-rosa-osc);
+      border-color: var(--mk-rosa-osc);
+      color: #fff;
+    }
+    /* Foco rosado en los campos (coherente con la marca) */
+    .form-control:focus, .form-select:focus {
+      border-color: var(--mk-rosa);
+      box-shadow: 0 0 0 .25rem rgba(230, 104, 143, .25);
+    }
+    .encabezado-marca {
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      font-size: .8rem;
+      color: var(--mk-rosa-osc);
+    }
+  </style>
+</head>
+
+<body class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-12 col-md-9 col-lg-7">
+
+        <!-- ENCABEZADO -->
+        <header class="text-center mb-4">
+          <p class="encabezado-marca mb-1">Mary Kay · Mendoza</p>
+          <h1 class="mb-2">Armá tu pedido</h1>
+          <p class="text-secondary mb-0">
+            Completá tus datos y el producto que querés. Tu pedido le llega
+            directo por WhatsApp a Nélida, tu consultora independiente.
+          </p>
+        </header>
+
+        <!-- TARJETA CON EL FORMULARIO -->
+        <div class="tarjeta-form p-4 p-md-5">
+
+          <!--
+            Formulario:
+            - class="needs-validation" + atributo novalidate  -> activa la
+              validación visual de Bootstrap (desactiva los globos del navegador
+              y usa los mensajes .invalid-feedback / .valid-feedback).
+          -->
+          <form id="formPedido" class="needs-validation" novalidate>
+
+            <!-- NOMBRE -->
+            <div class="mb-3">
+              <label for="nombre" class="form-label fw-medium">Nombre y apellido</label>
+              <input
+                type="text"
+                class="form-control"
+                id="nombre"
+                name="nombre"
+                placeholder="Ej.: María Gómez"
+                required
+                minlength="3">
+              <!-- Mensaje cuando el campo es inválido -->
+              <div class="invalid-feedback">Por favor ingresá tu nombre (mínimo 3 letras).</div>
+            </div>
+
+            <!-- EMAIL -->
+            <div class="mb-3">
+              <label for="email" class="form-label fw-medium">Correo electrónico</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                placeholder="tucorreo@ejemplo.com"
+                required>
+              <div class="invalid-feedback">Ingresá un correo válido (con @ y dominio).</div>
+            </div>
+
+            <!-- WHATSAPP / TELÉFONO -->
+            <div class="mb-3">
+              <label for="telefono" class="form-label fw-medium">WhatsApp</label>
+              <div class="input-group">
+                <span class="input-group-text">+54</span>
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="telefono"
+                  name="telefono"
+                  placeholder="2615123456"
+                  required
+                  pattern="[0-9]{8,13}">
+                <!-- pattern: solo números, entre 8 y 13 dígitos -->
+                <div class="invalid-feedback">Ingresá solo números (entre 8 y 13 dígitos).</div>
+              </div>
+            </div>
+
+            <!-- PRODUCTO (select) -->
+            <div class="mb-3">
+              <label for="producto" class="form-label fw-medium">Producto de interés</label>
+              <select class="form-select" id="producto" name="producto" required>
+                <option value="" selected disabled>Elegí un producto…</option>
+                <option>Base TimeWise 3D</option>
+                <option>Set de cuidado facial TimeWise</option>
+                <option>Labial gel semi-mate</option>
+                <option>Máscara de pestañas Lash Love</option>
+                <option>Perfume Thinking of You</option>
+                <option>Crema de manos Satin Hands</option>
+              </select>
+              <div class="invalid-feedback">Elegí al menos un producto.</div>
+            </div>
+
+            <!-- CANTIDAD -->
+            <div class="mb-3">
+              <label for="cantidad" class="form-label fw-medium">Cantidad</label>
+              <input
+                type="number"
+                class="form-control"
+                id="cantidad"
+                name="cantidad"
+                value="1"
+                min="1"
+                max="20"
+                required>
+              <div class="invalid-feedback">La cantidad debe ser entre 1 y 20.</div>
+            </div>
+
+            <!-- MENSAJE -->
+            <div class="mb-3">
+              <label for="mensaje" class="form-label fw-medium">Mensaje (opcional)</label>
+              <textarea
+                class="form-control"
+                id="mensaje"
+                name="mensaje"
+                rows="3"
+                placeholder="Ej.: prefiero el tono natural, ¿hacés envío a Godoy Cruz?"></textarea>
+            </div>
+
+            <!-- CONSENTIMIENTO -->
+            <div class="form-check mb-4">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="acepto"
+                name="acepto"
+                required>
+              <label class="form-check-label" for="acepto">
+                Acepto que Nélida me contacte por WhatsApp para coordinar el pedido.
+              </label>
+              <div class="invalid-feedback">Necesitamos tu consentimiento para contactarte.</div>
+            </div>
+
+            <!-- BOTÓN DE ENVÍO -->
+            <div class="d-grid">
+              <button type="submit" class="btn btn-mk btn-lg rounded-pill">
+                Enviar pedido por WhatsApp
+              </button>
+            </div>
+          </form>
+
+          <!-- Aviso de éxito (oculto hasta que el formulario sea válido) -->
+          <div id="avisoOk" class="alert alert-success mt-4 d-none" role="alert">
+            ¡Listo! Abrimos WhatsApp con tu pedido cargado. Si no se abrió solo,
+            revisá que tu navegador permita la ventana emergente.
+          </div>
+
+        </div>
+
+        <footer class="text-center text-secondary mt-4 small">
+          Consultora Independiente de Belleza · Mary Kay · Mendoza, Argentina
+        </footer>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap 5.3 (JS con Popper) -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Lógica de validación y envío -->
+  <script>
+    // Número de WhatsApp de Nélida (formato internacional, sin + ni espacios)
+    const WHATSAPP_NELIDA = '5492615000000'; // <-- reemplazar por el número real
+
+    const formulario = document.getElementById('formPedido');
+    const avisoOk     = document.getElementById('avisoOk');
+
+    formulario.addEventListener('submit', function (evento) {
+      evento.preventDefault();   // evitamos el envío/recarga por defecto
+
+      // checkValidity() recorre todas las reglas HTML5 (required, pattern, etc.)
+      if (!formulario.checkValidity()) {
+        // Si algo falla, Bootstrap muestra los mensajes con la clase was-validated
+        formulario.classList.add('was-validated');
+        return;
+      }
+
+      // --- A partir de acá el formulario ES VÁLIDO ---
+      formulario.classList.add('was-validated');
+
+      // Tomamos los valores para armar el mensaje de WhatsApp
+      const nombre   = document.getElementById('nombre').value.trim();
+      const producto = document.getElementById('producto').value;
+      const cantidad = document.getElementById('cantidad').value;
+      const mensaje  = document.getElementById('mensaje').value.trim();
+
+      let texto = `Hola Nélida! Soy ${nombre}.%0A`;
+      texto += `Quiero pedir: ${cantidad} x ${producto}.`;
+      if (mensaje) texto += `%0ANota: ${mensaje}`;
+
+      // Mostramos el aviso de éxito
+      avisoOk.classList.remove('d-none');
+
+      // Abrimos WhatsApp con el pedido ya escrito
+      // (En un sistema con servidor, acá iría:  fetch('/api/pedido', {method:'POST', body: ...}) )
+      window.open(`https://wa.me/${WHATSAPP_NELIDA}?text=${texto}`, '_blank');
+    });
+  </script>
+</body>
+</html>
